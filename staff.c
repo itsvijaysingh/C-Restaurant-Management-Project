@@ -1,205 +1,260 @@
-//[---------------------- : Function Declarations : ----------------------]
-
-// Structure definition for Staff
-typedef struct Staff {
+//[---------------------- : Custom Structures : ----------------------]
+typedef struct {
     int id;
-    char name[50];
+    char name[100];
+    char phone[11];
+    char aadhar[13];
+    char address[200];
     char position[50];
-    float salary;
+    int salary;
+    char joinDate[20];
+    char status[4];
 } Staff;
 
-// Function declarations
+Staff staff;
+
+//[---------------------- : Function Declarations : ----------------------]
 int addStaff();
 int updateStaff();
 int displayStaff();
 int removeStaff();
-int getNextStaffId();
+int searchStaff();
 
-// Main function for staff management
+//[---------------------- : ANSI Color Codes  : ----------------------]
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
+//[---------------------- : Staff Management - Main Program  : ----------------------]
 int staffManagement() {
     int choice;
     
     while (1) {
-        printf("\n\t <--: S T A F F - M A N A G E M E N T :--> ");
-        printf("\n\t * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-        printf("\n\t * Enter : [1] --> A D D - S T A F F                       * ");
-        printf("\n\t * Enter : [2] --> U P D A T E - S T A F F                 * ");
-        printf("\n\t * Enter : [3] --> D I S P L A Y - A L L - S T A F F       * ");
-        printf("\n\t * Enter : [4] --> R E M O V E - S T A F F                 * ");
-        printf("\n\t * Enter : [5] --> B A C K - T O - M A I N                 * ");
-        printf("\n\t * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+        system("clear");
+        printf(ANSI_COLOR_YELLOW);
+        printf("\n\t\t\t\t\t\t╔═════════════════════════════════════════════════════════════╗");
+        printf("\n\t\t\t\t\t\t║                                                             ║");
+        printf("\n\t\t\t\t\t\t║          <--: T H E  M I D D A Y  R E S T R O :-->          ║");
+        printf("\n\t\t\t\t\t\t║                                                             ║");
+        printf("\n\t\t\t\t\t\t╚═════════════════════════════════════════════════════════════╝");
+        printf("\n\t\t\t\t\t\t                   ║  S T A F F S  ║                             ");
+        printf("\n\t\t\t\t\t\t                   ╚═══════════════╝                             \n\n");
+        printf(ANSI_COLOR_RESET);
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t * Enter : [1] --> A D D - S T A F F                                                                               * \n");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t * Enter : [2] --> U P D A T E - S T A F F                                                                         * \n");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t * Enter : [3] --> D I S P L A Y - S T A F F                                                                       * \n");    
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t * Enter : [4] --> R E M O V E - S T A F F                                                                         * \n");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t * Enter : [5] --> S E A R C H - S T A F F                                                                         * \n");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t * Enter : [6] --> R E T U R N - TO - D A S H B O A R D                                                            * \n");            
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n");
 
-        printf("\n\t Enter Your Choice : --> ");
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\t\t | Enter Your Choice : --> ");
+        printf(ANSI_COLOR_RESET);
         scanf("%d", &choice);
-
         switch (choice) {
+            //[---------------------- : Add - Staff : ----------------------]
             case 1:
                 addStaff();
                 break;
+
+            //[---------------------- : Update - Staff : ----------------------]
             case 2:
                 updateStaff();
                 break;
+
+            //[---------------------- : Display - Staff : ----------------------]
             case 3:
                 displayStaff();
                 break;
+
+            //[---------------------- : Remove - Staff : ----------------------]
             case 4:
                 removeStaff();
                 break;
+
+            //[---------------------- : Search - Staff : ----------------------]
             case 5:
-                printf("\nExiting From Staff Management...\n");
-                return 0;
-            default:
-                printf("\nError: Invalid Choice\n");
-                printf("Please select a valid option from the choices.\n");
+                searchStaff();
                 break;
+
+            //[---------------------- : Exit From Staff Management Window : ----------------------]
+            case 6:
+                system("clear");
+                printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                printf("\t\t\t\t\t\t\tReturning Back to Dashboard"); // Loading();
+                system("clear");
+                return 0;
+                break;
+
+            //[---------------------- : Re-Enter Into Staff Management Window : ----------------------]
+            default:
+                system("clear");
+                printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                printf(ANSI_COLOR_RED);
+                printf("\t\t\t\t\t\t\t\tError: Invalid Choice\n\n");
+                printf(ANSI_COLOR_RESET);
+                printf("\t\t\t\t\t\t\tPlease select a valid option from the choices.\n\n");      
+                //sleep(1);     
+                printf("\t\t\t\t\t\t\tRe-Enter The Valid Choice"); // Loading();
+                system("clear");
+                continue;
         }
     }
     return 0;
 }
 
-//[---------------------- : Function Definitions : ----------------------]
-
-// Function to add a new staff member
+//[---------------------- : Add - Staff : ----------------------]
 int addStaff() {
-    FILE *fp = fopen("staffData.txt", "a+");
-    if (fp == NULL) {
-        printf("\n\tFile Opening Failed.....");
-        return 0;
-    }
+    int i;
+    char choice;
+    int totalStaff = 0;
+    int lastId = 0;
+    FILE *fp = NULL;
 
-    Staff staff;
-    staff.id = getNextStaffId();
-    printf("\nEnter Staff Name: ");
-    scanf("%s", staff.name);
-    printf("Enter Staff Position: ");
-    scanf("%s", staff.position);
-    printf("Enter Staff Salary: ");
-    scanf("%f", &staff.salary);
+    do {
+        fp = fopen("staffData.txt", "a+");
+        if (fp == NULL) {
+            printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+            printf(ANSI_COLOR_RED);
+            printf("\n\n\t\t Error: Data file not found!"); Loading();
+            printf(ANSI_COLOR_RESET);
+            return 1;
+        }
 
-    fprintf(fp, "%d %s %s %.2f\n", staff.id, staff.name, staff.position, staff.salary);
-    fclose(fp);
+        system("clear");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t *                                ---: P R O V I D E  - S T A F F - D E T A I L S :---                                    * \n");
+        printf("\n\t\t =========================================================================================================================== \n");
 
-    printf("\nStaff added successfully.\n");
-    return 0;
-}
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\t\t | Enter Total Staff Do You Want To Add? : --> ");
+        printf(ANSI_COLOR_RESET);
+        validateNumInput(&totalStaff);
 
-// Function to update an existing staff member
-int updateStaff() {
-    int idToUpdate;
-    printf("\nEnter the ID of the staff member you want to update: ");
-    scanf("%d", &idToUpdate);
-
-    FILE *fp = fopen("staffData.txt", "r+");
-    if (fp != NULL) {
-        Staff temp;
-        int found = 0;
-
-        while (fscanf(fp, "%d%s%s%f", &temp.id, temp.name, temp.position, &temp.salary) == 4) {
-            if (temp.id == idToUpdate) {
-                printf("Enter the new staff name: ");
-                scanf("%s", temp.name);
-                printf("Enter the new staff position: ");
-                scanf("%s", temp.position);
-                printf("Enter the new staff salary: ");
-                scanf("%f", &temp.salary);
-
-                fseek(fp, -1 * (strlen(temp.name) + strlen(temp.position) + sizeof(temp.salary) + 3), SEEK_CUR);
-                fprintf(fp, "%d %s %s %.2f\n", temp.id, temp.name, temp.position, temp.salary);
-                found = 1;
-                break;
+        // Read the last ID from the file
+        fseek(fp, 0, SEEK_END);
+        if (ftell(fp) != 0) {
+            rewind(fp);
+            while (fscanf(fp, "%d", &lastId) == 1) {
+                fscanf(fp, "%*[^\n]");
             }
         }
-        fclose(fp);
-        if (!found) {
-            printf("\nStaff member with ID %d not found.\n", idToUpdate);
+
+        for (i = 0; i < totalStaff; i++) {
+
+            staff.id = lastId + i + 1; // Increment last ID
+
+            printf("\n\t\t | Enter Staff Name            :--> ");
+            scanf("%s", staff.name);
+            printf("\n\t\t | Enter Staff Phone           :--> ");
+            validateInputLength(staff.phone, 10);
+            printf("\n\t\t | Enter Staff Aadhar          :--> ");
+            validateInputLength(staff.phone, 12);
+            printf("\n\t\t | Enter Staff Address         :--> ");
+            validateStringInput2(staff.address);
+            printf("\n\t\t | Enter Staff Position        :--> ");
+            validateStringInput(staff.position);
+            printf("\n\t\t | Enter Staff Salary          :--> ");
+            validateNumInput(&staff.salary);
+            printf("\n\t\t | Enter Staff Join Date(DD/MM/YYYY)       :--> ");
+            validateStringInput2(staff.joinDate);
+            printf("\n\t\t | Enter Staff Status (Busy/Free):--> ");
+            validateStringInput(staff.status);
+            
+            fprintf(fp, "%d\t\t%s\t\t%s\t\t%s\t\t%s\t\t%s\t\t%d\t\t%s\t\t%s\n", 
+                staff.id, staff.name, staff.phone, staff.aadhar, staff.address, staff.position, 
+                staff.salary, staff.joinDate, staff.status);
         }
-    } else {
-        printf("\nFile Not Found...");
-    }
+
+        fclose(fp);
+
+        printf("\n\t\t---------------------------------------------------------------------------------------------------------------------------\n");
+        printf(ANSI_COLOR_GREEN);
+        printf("\n\t\t%d staff added successfully!", totalStaff); Loading();
+        printf(ANSI_COLOR_RESET);
+        printf("\n\t\t---------------------------------------------------------------------------------------------------------------------------\n");
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\t\t | Do you want to add more staff? (Y/N): ");
+        printf(ANSI_COLOR_RESET);
+        scanf(" %c", &choice);
+        while (getchar() != '\n');
+    } while (choice == 'Y' || choice == 'y');
+
     return 0;
 }
 
-// Function to display all staff members
+
+//[---------------------- : Update - Staff : ----------------------]
+int updateStaff() {
+    // Implement the update staff function here
+    return 0;
+}
+
+//[---------------------- : Display - Staff : ----------------------]
+//[---------------------- : Display - Staff : ----------------------]
 int displayStaff() {
-    FILE *fp = fopen("staffData.txt", "r");
+    FILE *fp = NULL;
+    fp = fopen("staffData.txt", "r");
     if (fp != NULL) {
-        printf("\nStaff Members:\n");
-        printf("ID\tName\tPosition\tSalary\n");
-        Staff staff;
-        while (fscanf(fp, "%d%s%s%f", &staff.id, staff.name, staff.position, &staff.salary) == 4) {
-            printf("%d\t%s\t%s\t%.2f\n", staff.id, staff.name, staff.position, staff.salary);
+        system("clear");
+
+        printf(ANSI_COLOR_YELLOW);
+        printf("\n\t\t\t\t\t\t╔═════════════════════════════════════════════════════════════╗");
+        printf("\n\t\t\t\t\t\t║                                                             ║");
+        printf("\n\t\t\t\t\t\t║          <--: T H E  M I D D A Y  R E S T R O :-->          ║");
+        printf("\n\t\t\t\t\t\t║                                                             ║");
+        printf("\n\t\t\t\t\t\t╚═════════════════════════════════════════════════════════════╝");
+        printf("\n\t\t\t\t\t\t                   ║  S T A F F S  ║                             ");
+        printf("\n\t\t\t\t\t\t                   ╚═════════════════╝ \n");
+        printf(ANSI_COLOR_RESET);
+
+        printf("\n\t\t\t\t\t ╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗");
+        printf("\n\t\t\t\t\t ║ %-10s | %-20s | %-15s | %-15s | %-20s | %-10s | %-20s | %-10s |\n", "ID", "Name", "Phone", "Aadhar", "Address", "Position", "Join Date", "Status");
+        printf("\t\t\t\t\t ║════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════║");
+        
+        while (fscanf(fp, "%d %s %s %s %s %s %d %s %s", &staff.id, staff.name, staff.phone, staff.aadhar, staff.address, staff.position, &staff.salary, staff.joinDate, staff.status) == 9) {
+            printf("\n\t\t\t\t\t ║ %-10d | %-20s | %-15s | %-15s | %-20s | %-10s | %-20s | %-10s |", staff.id, staff.name, staff.phone, staff.aadhar, staff.address, staff.position, staff.joinDate, staff.status);
         }
+
+        printf("\n\t\t\t\t\t ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n");
         fclose(fp);
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\n\t\t\t\t\t | Press any key to go back...");
+        printf(ANSI_COLOR_RESET);
+        getchar();
+        getchar();
     } else {
-        printf("\nFile Not Found...");
-    }
+        printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+        printf(ANSI_COLOR_RED);
+        printf("\n\n\t\t Error: no data files exist"); Loading();
+        printf(ANSI_COLOR_RESET);
+        return 1;
+}
     return 0;
 }
 
-// Function to remove a staff member
+
+
+//[---------------------- : Remove - Staff : ----------------------]
 int removeStaff() {
-    int idToRemove;
-    printf("\nEnter the ID of the staff member you want to remove: ");
-    scanf("%d", &idToRemove);
-
-    FILE *fpIn = fopen("staffData.txt", "r");
-    FILE *fpOut = fopen("tempStaffData.txt", "w");
-
-    if (fpIn == NULL || fpOut == NULL) {
-        printf("Error opening file.");
-        return 1;
-    }
-
-    Staff temp;
-    int found = 0;
-
-    while (fscanf(fpIn, "%d%s%s%f", &temp.id, temp.name, temp.position, &temp.salary) == 4) {
-        if (temp.id == idToRemove) {
-            found = 1;
-            continue; // Skip this line
-        }
-        fprintf(fpOut, "%d %s %s %.2f\n", temp.id, temp.name, temp.position, temp.salary);
-    }
-
-    fclose(fpIn);
-    fclose(fpOut);
-
-    if (!found) {
-        printf("Staff member with ID %d not found.\n", idToRemove);
-        remove("tempStaffData.txt"); // Delete the temporary file
-        return 1;
-    }
-
-    remove("staffData.txt"); // Remove the original file
-    rename("tempStaffData.txt", "staffData.txt"); // Rename the temporary file
-
-    printf("Staff member with ID %d removed successfully.\n", idToRemove);
+    // Implement the remove staff function here
     return 0;
 }
 
-// Function to get the next available staff ID
-int getNextStaffId() {
-    FILE *fp = fopen("staffData.txt", "r");
-    if (fp == NULL) {
-        return 1; // Start from ID 1 if file doesn't exist
-    }
-
-    int maxId = 0;
-    int currentId;
-    // Skip first 5 lines
-    for (int i = 0; i < 5; ++i) {
-        char line[100];
-        fgets(line, sizeof(line), fp);
-    }
-
-    while (fscanf(fp, "%d", &currentId) == 1) {
-        if (currentId > maxId) {
-            maxId = currentId;
-        }
-        // Skip other fields
-        fscanf(fp, "%*[^\n]\n");
-    }
-
-    fclose(fp);
-    return maxId + 1;
+//[---------------------- : Search - Staff : ----------------------]
+int searchStaff() {
+    // Implement the search staff function here
+    return 0;
 }

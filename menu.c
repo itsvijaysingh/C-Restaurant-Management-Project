@@ -5,14 +5,16 @@ typedef struct MenuItem {
     int price;
 } MenuItem;
 MenuItem item;
+MenuItem temp;
 
 //[---------------------- : Function Declarations : ----------------------]
-int addMenuItem();     // add menu item
-int updateMenuItem();  // update menu item
-int displayMenuItems();  // display menu item
-int removeMenuItem();  // remove menu item
-int searchMenuItem();  // search menu item
-float getPrice(int menuItemId); // Declare getPrice() function
+int addMenuItem();
+int updateMenuItem();
+int displayMenuItems();
+int removeMenuItem();
+int searchMenuItem();
+float getPrice(int menuItemId);
+char* getMenuItemName(int menuItemId);
 
 //[---------------------- : ANSI Color Codes  : ----------------------]
 #define ANSI_COLOR_RED     "\x1b[31m"
@@ -116,137 +118,196 @@ int menuManagement() {
 int addMenuItem() {
     FILE *fp = NULL;
     int size, i;
-    int itemId;
     int uniqueId = 0;
+    int line_count = 0;
+    int c;
+    char choice;
 
-    // Open menu data file
-    fp = fopen("menuData.txt", "a+");
-    if (fp == NULL) {
-        printf("\n\tFile Opening Failed.....");
-        return 0;
-    }
-
-    // Check if the file is empty
-    fseek(fp, 0, SEEK_END);
-    if (ftell(fp) == 0) {
-        // Add formatting lines
-        fprintf(fp, "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-        fprintf(fp, "\n:                  ---: M E N U S - D A T A (S) :---            :");
-        fprintf(fp, "\n-----------------------------------------------------------------");
-        fprintf(fp, "\nId\t\t\t\t\t\tName\t\t\t\t\t\tPrice");
-        fprintf(fp, "\n-----------------------------------------------------------------\n");
-    } else {
-        // Skip the first 5 lines if file is not empty
-        rewind(fp); // Move the file pointer to the beginning
-        for (int j = 0; j < 5; ++j) {
-            int c;
-            while ((c = fgetc(fp)) != EOF && c != '\n');
+    // Open the file to read the last used ID
+    fp = fopen("menuData.txt", "r");
+    if (fp != NULL) {
+        // Skip the first 5 lines in the file
+        while (line_count < 5) {
+            c = fgetc(fp);
+            if (c == '\n' || c == EOF) {
+                line_count++;
+                if (c == EOF) break;
+            }
         }
-    }
 
-    // Retrieve the last ID from the file and Skip name & price
-    while (fscanf(fp, "%d", &uniqueId) == 1) {
-        fscanf(fp, "%*s %*d");
-    }
+        // Retrieve the last ID from the file and skip name & price
+        while (fscanf(fp, "%d", &uniqueId) == 1) {
+            fscanf(fp, "%*[^\n]");
+        }
 
-    uniqueId++;
+        fclose(fp);
 
-    fseek(fp, 0, SEEK_END);
-    system("clear");
-    printf("\n\t\t =========================================================================================================================== \n");
-    printf("\n\t\t *                                   ---: P R O V I D E  - I T E M S - D E T A I L S :---                                  * \n");
-    printf("\n\t\t =========================================================================================================================== \n");
-
-    printf(ANSI_COLOR_BLUE);
-    printf("\n\t\t | Enter Total Items Do You Want To Add? : --> ");
-    printf(ANSI_COLOR_RESET);
-    validateNumInput(&size);
-
-    // Read item details and write to file
-    for(i = 0; i < size; i++) {
+        // Increment the last used ID to generate a new unique ID
+        uniqueId++;
+    } else {
         printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
-        printf("\n\t\t Item %d Details : ", i+1);
-
-        item.id = uniqueId++;
-
-        printf("\n\n\t\t\t | Enter Item Name  :--> ");
-        scanf("%s", item.name); // Read item name
-
-        printf("\n\n\t\t\t | Enter Item Price :--> ");
-        scanf("%d", &item.price); // Read item price
-
-        fprintf(fp, "%d\t\t\t\t\t\t%s\t\t\t\t\t\t%d\n", item.id, item.name, item.price);
+        printf(ANSI_COLOR_RED);
+        printf("\n\n\t\t Error: Data file not found!");  Loading();
+        printf(ANSI_COLOR_RESET);
+        return 1;
     }
 
-    fclose(fp);
-    printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
-    printf(ANSI_COLOR_GREEN);
-    printf("\n\t\t %d items added successfully!", size); Loading();
-    printf(ANSI_COLOR_RESET);
-    system("clear");
+    do {
+        fp = fopen("menuData.txt", "a+");
+        if (fp == NULL) {
+            printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+            printf(ANSI_COLOR_RED);
+            printf("\n\n\t\t Error: Data file not found!");  Loading();
+            printf(ANSI_COLOR_RESET);
+            return 1;
+        }
+
+        fseek(fp, 0, SEEK_END);
+        if (ftell(fp) == 0) {
+            fprintf(fp, "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+            fprintf(fp, "\n:                  ---: M E N U S - D A T A (S) :---            :");
+            fprintf(fp, "\n-----------------------------------------------------------------");
+            fprintf(fp, "\nId\t\t\t\t\t\tName\t\t\t\t\t\tPrice");
+            fprintf(fp, "\n-----------------------------------------------------------------\n");
+        }
+
+        fseek(fp, 0, SEEK_END);
+        system("clear");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t *                                   ---: P R O V I D E  - I T E M S - D E T A I L S :---                                  * \n");
+        printf("\n\t\t =========================================================================================================================== \n");
+
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\t\t | Enter Total Items Do You Want To Add? : --> ");
+        printf(ANSI_COLOR_RESET);
+        validateNumInput(&size);
+
+        // Read item details and write to file
+        for (i = 0; i < size; i++) {
+            printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+            printf("\n\t\t Item %d Details : ", i + 1);
+
+            item.id = uniqueId++;
+
+            printf("\n\n\t\t\t | Enter Item Name  :--> ");
+            validateStringInput(item.name);
+
+            printf("\n\n\t\t\t | Enter Item Price :--> ");
+            validateNumInput(&item.price);
+
+            fprintf(fp, "%d\t\t\t\t\t\t%s\t\t\t\t\t\t%d\n", item.id, item.name, item.price);
+        }
+
+        fclose(fp);
+
+        printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+        printf(ANSI_COLOR_GREEN);
+        printf("\n\t\t %d items added successfully!", size); Loading();
+        printf(ANSI_COLOR_RESET);
+
+        printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\t\t | Do you want to add another item? (Y/N): --> ");
+        printf(ANSI_COLOR_RESET);
+        scanf(" %c", &choice);
+        while (getchar() != '\n');
+    } while (choice == 'Y' || choice == 'y');
+
     return 0;
 }
-
 
 //[---------------------- : Update - Menu Item (S) - Function : ----------------------]
 int updateMenuItem() {
     int idToUpdate;
-    system("clear");
-    printf("\n\t\t =========================================================================================================================== \n");
-    printf("\n\t\t *                                   ---: P R O V I D E  - I T E M S - D E T A I L S :---                                  * \n");
-    printf("\n\t\t =========================================================================================================================== \n");
-    printf(ANSI_COLOR_BLUE);
-    printf("\n\t\t | Enter the ID of the item you want to update: --> ");
-    printf(ANSI_COLOR_RESET);
-    scanf("%d", &idToUpdate);
+    char choice;
+    MenuItem temp;
+    FILE *fpIn;
+    FILE *fpOut;
+    char line[100];
+    int found = 0;
+    int j;
 
-    FILE *fp = fopen("menuData.txt", "r+");
-    if (fp != NULL) {
-        MenuItem temp;
-        int found = 0;
+    do {
+        system("clear");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t *                                   ---: P R O V I D E  - I T E M S - D E T A I L S :---                                  * \n");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\t\t | Enter the ID of the item you want to update: --> ");
+        printf(ANSI_COLOR_RESET);
+        validateNumInput(&idToUpdate);
 
-        // Skip the first 5 lines if the file is not empty
-        rewind(fp); // Move the file pointer to the beginning
-        for (int j = 0; j < 5; ++j) {
-            int c;
-            while ((c = fgetc(fp)) != EOF && c != '\n');
+
+        fpIn = fopen("menuData.txt", "r");
+        fpOut = fopen("tempMenuData.txt", "w");
+
+        if (fpIn == NULL || fpOut == NULL) {
+            printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+            printf(ANSI_COLOR_RED);
+            printf("\n\n\t\t Error: opening file");  Loading();
+            printf(ANSI_COLOR_RESET);
+            return 1;
         }
 
-        while (fscanf(fp, "%d%s%d", &temp.id, temp.name, &temp.price) == 3) {
-            if (temp.id == idToUpdate) {
-                printf("\n\n\t\t\t | Enter the new name for the item :--> ");
-                scanf("%s", temp.name);
-                printf("\n\n\t\t\t | Enter the new price for the item :--> ");
-                scanf("%d", &temp.price);
-                // Move the file pointer to the beginning of the line
-                fseek(fp, -1 * (strlen(temp.name) + sizeof(temp.price) + 5), SEEK_CUR);
-                // Write the updated name and price
-                fprintf(fp, "%s\t\t\t\t\t\t%d\n", temp.name, temp.price);
-                found = 1;
-                break;
+        // Preserve the first 5 lines of formatting
+        for (j = 0; j < 5; ++j) {
+            if (fgets(line, sizeof(line), fpIn) == NULL) {
+                printf("Error reading file.");
+                return 1;
+            }
+            fprintf(fpOut, "%s", line);
+        }
+
+        while (fgets(line, sizeof(line), fpIn) != NULL) {
+            if (sscanf(line, "%d %[^\t\n] %d", &temp.id, temp.name, &temp.price) == 3) {
+                
+                if (temp.id == idToUpdate) {
+                    found = 1;
+                    printf("\n\n\t\t\t | Enter the new name for the item: ");
+                    validateStringInput(temp.name);
+                    printf("\n\n\t\t\t | Enter the new price for the item: ");
+                    validateNumInput(&temp.price);
+                }
+                fprintf(fpOut, "%d\t\t\t\t\t\t%s\t\t\t\t\t\t%d\n", temp.id, temp.name, temp.price);
             }
         }
-        fclose(fp);
+
+        fclose(fpIn);
+        fclose(fpOut);
+
         if (!found) {
+            printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
             printf(ANSI_COLOR_RED);
-            printf("\n\tItem with ID %d not found.\n", idToUpdate);
+            printf("\n\t\t Item with ID %d not found", idToUpdate); 
             printf(ANSI_COLOR_RESET);
-        }else{
+            remove("tempMenuData.txt");
+        } else {
+            remove("menuData.txt");
+            rename("tempMenuData.txt", "menuData.txt");
             printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
             printf(ANSI_COLOR_GREEN);
-            printf("\n\t\t Item %d updated successfully!", idToUpdate); Loading();
+            printf("\n\t\t Item %d updated successfully!", idToUpdate);
             printf(ANSI_COLOR_RESET);
-            system("clear");
         }
-    } else {
-        printf("\n\tFile Not Found...");
-    }
+
+        printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\t\t | Do you want to update another item? (Y/N): --> ");
+        printf(ANSI_COLOR_RESET);
+        scanf(" %c", &choice);
+        while (getchar() != '\n');
+    } while (choice == 'Y' || choice == 'y');
+
     return 0;
 }
 
+
 //[---------------------- : Display - Menu Item (S) - Function : ----------------------]
 int displayMenuItems() {
-    FILE *fp = fopen("menuData.txt", "r");
+    FILE *fp = NULL;
+    int j, c;
+    float price_with_gst;
+    fp = fopen("menuData.txt", "r");
     if (fp != NULL) {
         system("clear");
         printf(ANSI_COLOR_YELLOW);
@@ -256,33 +317,35 @@ int displayMenuItems() {
         printf("\n\t\t\t\t\t\t║                                                             ║");
 		printf("\n\t\t\t\t\t\t╚═════════════════════════════════════════════════════════════╝");
         printf("\n\t\t\t\t\t\t                   ║   M E N U   ║                             ");
-        printf("\n\t\t\t\t\t\t                   ╚═════════════╝                             \n\n");
+        printf("\n\t\t\t\t\t\t                   ╚═════════════╝                             \n");
         printf(ANSI_COLOR_RESET);
 
         printf("\n\t\t\t\t\t ╔═════════════════════════════════════════════════════════════════════╗");
         printf("\n\t\t\t\t\t ║ %-10s ║ %-30s ║ %-23s ║", "ID", "Name", "Price (\u20B9 +GST)");
         // Skip the first 5 lines if the file is not empty
-        rewind(fp); // Move the file pointer to the beginning
-        for (int j = 0; j < 5; ++j) {
-            int c;
+        rewind(fp);
+        for (j = 0; j < 5; ++j) {
             while ((c = fgetc(fp)) != EOF && c != '\n');
         }
 
-        while (fscanf(fp, "%d%s%d", &item.id, item.name, &item.price) == 3) {
-            float price_with_gst = item.price * (1 + 0.18);
+        while (fscanf(fp, "%d %[^\t\n] %d", &item.id, item.name, &item.price) == 3) {
+            price_with_gst = item.price * (1 + 0.18);
             printf("\n\t\t\t\t\t ║=====================================================================║");
             printf("\n\t\t\t\t\t ║ %-10d | %-30s | %-21.2f ║", item.id, item.name, price_with_gst);
         }
         printf("\n\t\t\t\t\t ╚═════════════════════════════════════════════════════════════════════╝\n");
-
+        fclose(fp);
         printf(ANSI_COLOR_BLUE);
         printf("\n\n\t\t\t\t\t | Press any key to go back...");
         printf(ANSI_COLOR_RESET);
         getchar();
         getchar();
-        fclose(fp);
     } else {
-        printf("\n\tFile Not Found...");
+        printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+        printf(ANSI_COLOR_RED);
+        printf("\n\n\t\t Error: no data files exists");  Loading();
+        printf(ANSI_COLOR_RESET);
+        return 1;
     }
     return 0;
 }
@@ -292,71 +355,87 @@ int displayMenuItems() {
 //[---------------------- : Remove - Menu Item (S) - Function : ----------------------]
 int removeMenuItem() {
     int idToRemove;
-    system("clear");
-    printf("\n\t\t =========================================================================================================================== \n");
-    printf("\n\t\t *                                   ---: P R O V I D E  - I T E M S - D E T A I L S :---                                  * \n");
-    printf("\n\t\t =========================================================================================================================== \n");
-    printf(ANSI_COLOR_BLUE);
-    printf("\n\t\t | Enter the ID of the item you want to remove: --> ");
-    printf(ANSI_COLOR_RESET);
-    scanf("%d", &idToRemove);
-
-    FILE *fpIn = fopen("menuData.txt", "r");
-    FILE *fpOut = fopen("tempMenuData.txt", "w");
-
-    if (fpIn == NULL || fpOut == NULL) {
-        printf("Error opening file.");
-        return 1;
-    }
-
+    char choice;
+    MenuItem temp;
+    FILE *fpIn;
+    FILE *fpOut;
     char line[100];
-    int newID = 1; // To track the new IDs
+    int newID = 1;
     int found = 0;
+    int j;
 
-    // Preserve the first 5 lines of formatting
-    for (int j = 0; j < 5; ++j) {
-        if (fgets(line, sizeof(line), fpIn) == NULL) {
-            printf("Error reading file.");
+    do {
+        system("clear");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t *                                   ---: P R O V I D E  - I T E M S - D E T A I L S :---                                  * \n");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\t\t | Enter the ID of the item you want to remove: --> ");
+        printf(ANSI_COLOR_RESET);
+        validateNumInput(&idToRemove);
+
+
+        fpIn = fopen("menuData.txt", "r");
+        fpOut = fopen("tempMenuData.txt", "w");
+
+        if (fpIn == NULL || fpOut == NULL) {
+            printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+            printf(ANSI_COLOR_RED);
+            printf("\n\n\t\t Error: opening file");  Loading();
+            printf(ANSI_COLOR_RESET);
             return 1;
         }
-        fprintf(fpOut, "%s", line);
-    }
 
-    // Copy lines from fpIn to fpOut, except the line with idToRemove
-    while (fgets(line, sizeof(line), fpIn) != NULL) {
-        MenuItem temp;
-        if (sscanf(line, "%d %49s %d", &temp.id, temp.name, &temp.price) == 3) {
-            if (temp.id == idToRemove) {
-                found = 1;
-                continue; // Skip this line
+        // Preserve the first 5 lines of formatting
+        for (j = 0; j < 5; ++j) {
+            if (fgets(line, sizeof(line), fpIn) == NULL) {
+                printf("Error reading file.");
+                return 1;
             }
-            // Update ID if not removed
-            temp.id = newID++;
-            fprintf(fpOut, "%d\t\t\t\t\t\t%s\t\t\t\t\t\t%d\n", temp.id, temp.name, temp.price);
+            fprintf(fpOut, "%s", line);
         }
-    }
 
-    fclose(fpIn);
-    fclose(fpOut);
+        while (fgets(line, sizeof(line), fpIn) != NULL) {
+            if (sscanf(line, "%d %[^\t\n] %d", &temp.id, temp.name, &temp.price) == 3) {
+                
+                if (temp.id == idToRemove) {
+                    found = 1;
+                    continue;
+                }
+                temp.id = newID++;
+                fprintf(fpOut, "%d\t\t\t\t\t\t%s\t\t\t\t\t\t%d\n", temp.id, temp.name, temp.price);
+            }
+        }
 
-    if (!found) {
+        fclose(fpIn);
+        fclose(fpOut);
+
+        if (!found) {
+            printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+            printf(ANSI_COLOR_RED);
+            printf("\n\t\t Item with ID %d not found", idToRemove); 
+            printf(ANSI_COLOR_RESET);
+            remove("tempMenuData.txt");
+        } else {
+            remove("menuData.txt");
+            rename("tempMenuData.txt", "menuData.txt");
+            printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+            printf(ANSI_COLOR_GREEN);
+            printf("\n\t\t Item %d removed successfully!", idToRemove);
+            printf(ANSI_COLOR_RESET);
+        }
+
         printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
-        printf(ANSI_COLOR_RED);
-        printf("\n\t\t Item with ID %d not found", idToRemove); Loading();;
-        remove("tempMenuData.txt");
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\t\t | Do you want to remove another item? (Y/N): --> ");
         printf(ANSI_COLOR_RESET);
-        return 1;
-    }else{
-        remove("menuData.txt"); // Remove the original file
-        rename("tempMenuData.txt", "menuData.txt"); // Rename the temporary file
-        printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
-        printf(ANSI_COLOR_GREEN);
-        printf("\n\t\t Item %d removed successfully!", idToRemove); Loading();
-        printf(ANSI_COLOR_RESET);
-        system("clear");
-    }
+        scanf(" %c", &choice);
+        while (getchar() != '\n');
+    } while (choice == 'Y' || choice == 'y');
+
     return 0;
 }
+
 
 //[---------------------- : Search - Menu Item (S) - Function : ----------------------]
 int searchMenuItem() {
@@ -364,57 +443,57 @@ int searchMenuItem() {
     int idToSearch;
     int found = 0;
     char choice;
+    int j, c;
+    float price_with_gst;
 
     do {
+        system("clear");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf("\n\t\t *                                   ---: P R O V I D E  - I T E M S - D E T A I L S :---                                  * \n");
+        printf("\n\t\t =========================================================================================================================== \n");
+        printf(ANSI_COLOR_BLUE);
+        printf("\n\t\t | Enter the ID of the item you want to search: --> ");
+        printf(ANSI_COLOR_RESET);
+        validateNumInput(&idToSearch);
+
         fp = fopen("menuData.txt", "r");
-        if (fp != NULL) {
-            system("clear");
-            printf("\n\t\t =========================================================================================================================== \n");
-            printf("\n\t\t *                                   ---: P R O V I D E  - I T E M S - D E T A I L S :---                                  * \n");
-            printf("\n\t\t =========================================================================================================================== \n");
-            printf(ANSI_COLOR_BLUE);
-            printf("\n\t\t | Enter the ID of the item you want to search: --> ");
+        if (fp == NULL) {
+            printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+            printf(ANSI_COLOR_RED);
+            printf("\n\n\t\t Error: Data file not found!");  Loading();
             printf(ANSI_COLOR_RESET);
-            scanf("%d", &idToSearch);
+            return 1;
+        }
 
-            // Skip the first 5 lines if the file is not empty
-            for (int j = 0; j < 5; ++j) {
-                int c;
-                while ((c = fgetc(fp)) != EOF && c != '\n');
+        // Skip the first 5 lines if the file is not empty
+        for (j = 0; j < 5; ++j) {
+            while ((c = fgetc(fp)) != EOF && c != '\n');
+        }
+
+        while (fscanf(fp, "%d %[^\t\n] %d", &item.id, item.name, &item.price) == 3) {
+            if (idToSearch == item.id) {
+                system("clear");
+                price_with_gst = item.price * (1 + 0.18);
+                printf("\n\n\n\t\t\t\t\t ╔═════════════════════════════════════════════════════════════════════╗");
+                printf("\n\t\t\t\t\t ║               F O U N D  -  I T E M  -  D E T A I L S               ║");
+                printf("\n\t\t\t\t\t ║═════════════════════════════════════════════════════════════════════║");
+                printf("\n\t\t\t\t\t ║ %-10s ║ %-30s ║ %-23s ║", "ID", "Name", "Price (\u20B9 +GST)");
+                printf("\n\t\t\t\t\t ║=====================================================================║");
+                printf("\n\t\t\t\t\t ║ %-10d | %-30s | %-21.2f ║", item.id, item.name, price_with_gst);
+                printf("\n\t\t\t\t\t ╚═════════════════════════════════════════════════════════════════════╝\n");
+                found = 1;
+                break;
             }
+            fgetc(fp);
+        }
 
-            // Read each item from the file
-            while (fscanf(fp, "%d%s%d", &item.id, item.name, &item.price) == 3) {
-                if (idToSearch == item.id) {
-                    system("clear");
-                    float price_with_gst = item.price * (1 + 0.18);
-                    printf("\n\n\n\t\t\t\t\t ╔═════════════════════════════════════════════════════════════════════╗");
-                    printf("\n\t\t\t\t\t ║               F O U N D  -  I T E M  -  D E T A I L S               ║");
-                    printf("\n\t\t\t\t\t ║═════════════════════════════════════════════════════════════════════║");
-                    printf("\n\t\t\t\t\t ║ %-10s ║ %-30s ║ %-23s ║", "ID", "Name", "Price (\u20B9 +GST)");
-                    printf("\n\t\t\t\t\t ║=====================================================================║");
-                    printf("\n\t\t\t\t\t ║ %-10d | %-30s | %-21.2f ║", item.id, item.name, price_with_gst);
-                    printf("\n\t\t\t\t\t ╚═════════════════════════════════════════════════════════════════════╝\n");
-                    found = 1;
-                    break;
-                }
-                // Read and discard the newline character
-                fgetc(fp);
-            }
+        fclose(fp);
 
-            if (!found) {
-                printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
-                printf(ANSI_COLOR_RED);
-                printf("\n\n\t\t\tError: ");
-                printf(ANSI_COLOR_RESET);
-                printf("Item with ID %d not found.\n\n", idToSearch);
-            }
-
-            fclose(fp);
-        } else {
-            printf("\n\tFile Not Found...");
-            return 0;
-        
+        if (!found) {
+            printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
+            printf(ANSI_COLOR_RED);
+            printf("\n\n\t\t Error: Item with ID %d not found", idToSearch);  Loading();
+            printf(ANSI_COLOR_RESET);
         }
 
         printf("\n\t\t --------------------------------------------------------------------------------------------------------------------------- \n");
@@ -422,11 +501,8 @@ int searchMenuItem() {
         printf("\n\t\t | Do you want to search for another item? (Y/N): --> ");
         printf(ANSI_COLOR_RESET);
         scanf(" %c", &choice);
-
-        // Convert the choice to uppercase for simplicity
-        choice = choice;
+        while (getchar() != '\n');
     } while (choice == 'Y' || choice == 'y');
-
     return 0;
 }
 
@@ -434,20 +510,23 @@ int searchMenuItem() {
 float getPrice(int menuItemId) {
     FILE *fp;
     MenuItem item;
-    float price = -1.0; // Default value if item not found
+    int j;
+    float price = -1.0;
+    char line[100];
 
     fp = fopen("menuData.txt", "r");
     if (fp != NULL) {
         rewind(fp);
-        for (int j = 0; j < 5; ++j) {
-            int c;
-            while ((c = fgetc(fp)) != EOF && c != '\n');
+        for (j = 0; j < 5; ++j) {
+            fgets(line, sizeof(line), fp); // Skip the formatting lines
         }
 
-        while (fscanf(fp, "%d%s%d", &item.id, item.name, &item.price) == 3) {
-            if (item.id == menuItemId) {
-                price = (float)item.price;
-                break;
+        while (fgets(line, sizeof(line), fp) != NULL) {
+            if (sscanf(line, "%d %[^\t\n] %d", &item.id, item.name, &item.price) == 3) {
+                if (item.id == menuItemId) {
+                    price = (float)item.price;
+                    break;
+                }
             }
         }
         fclose(fp);
@@ -456,4 +535,38 @@ float getPrice(int menuItemId) {
     }
 
     return price;
+}
+
+
+//[---------------------- : Get Menu Item Name Function : ----------------------]
+char* getMenuItemName(int menuItemId) {
+    FILE *fp;
+    char line[50];
+    static char name[100];
+
+    fp = fopen("menuData.txt", "r");
+    if (fp != NULL) {
+        // Skip the header lines
+        for (int i = 0; i < 5; ++i) {
+            fgets(line, sizeof(line), fp);
+        }
+
+        // Read each menu item entry and compare IDs
+        while (fgets(line, sizeof(line), fp) != NULL) {
+            MenuItem item;
+            if (sscanf(line, "%d %[^\t\n] %d", &item.id, item.name, &item.price) == 3) {
+                if (item.id == menuItemId) {
+                    strcpy(name, item.name);
+                    fclose(fp);
+                    return name;
+                }
+            }
+        }
+
+        fclose(fp);
+    } else {
+        fprintf(stderr, "Error: Could not open menu data file.\n");
+    }
+
+    return NULL;
 }

@@ -3,8 +3,18 @@
 -----------------------------------------------------------------
 Id						Name						Price
 -----------------------------------------------------------------
-1						mvbgh						433
-2						pizza						399
-3						nimu						234
-4						mango						899
-7						maggy						121
+1						Samosa						20
+2						Chicken Biryani						300
+3						Masala Dosa						100
+4						Chole Bhature						150
+5						Tandoori Roti						20
+6						Veg Pulao						180
+7						Gulab Jamun						50
+8						Paneer Tikka						180
+9						Rajma Chawal						150
+10						Vegetable Biryani						250
+11						Mutton Curry						350
+12						Dal Makhani						200
+13						Naan						30
+14						Butter Chicken						250
+15						Burger						99

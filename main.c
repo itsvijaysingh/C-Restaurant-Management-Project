@@ -2,21 +2,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h> // for delay tasks using usleep (global function -- delay(time in ms))
-#include <time.h> // for current date and time
-#include "globalFunctions.c"  // links custom global functions
-#include "menu.c" // menu management file
-#include "order.c" // order management file
-#include "staff.c" // staff management file
+#include <unistd.h>
+#include <time.h>
+#include<ctype.h>
+#include "globalFunctions.c"
+#include "menu.c"
+#include "order.c"
+#include "staff.c"
 
 //[---------------------- : ANSI Color Codes  : ----------------------]
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
 #define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLORBLUE    "\x1b[34m"
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_RESET   "\x1b[0m"       
+#define ANSI_COLOR_RESET   "\x1b[0m" 
 
 //[---------------------- : Welcome Screen  : ----------------------]
 void welcomeScreen() {
@@ -53,9 +54,9 @@ int login() {
     printf(ANSI_COLOR_RESET);
     scanf("%s", password);
     if (strcmp(username, "manager") == 0 && strcmp(password, "password") == 0) {
-        return 1; // Login successful
+        return 1;
     } else {
-        return 0; // Login failed
+        return 0;
     }
 }
 
@@ -64,20 +65,20 @@ int login() {
 //[---------------------- : Main Program  : ----------------------]
 int main() {
     int choice;
-    int loggedIn = 0; 
-    // Get current time
+    int loggedIn = 1; 
+
     time_t rawtime;
     struct tm *timeinfo;
 
     time(&rawtime);                 // Get the current time in seconds
-    timeinfo = localtime(&rawtime); // Convert to local time
+    timeinfo = localtime(&rawtime);
 
     while (1) {
         if (!loggedIn) {
             system("clear");
             welcomeScreen();
             if (login()) {
-                        loggedIn = 1; // Set login status to logged in
+                        loggedIn = 1;
                         printf("\n\t\t\t\t\t  ------------------------------------------------------------------------------\n");   
                         printf(ANSI_COLOR_GREEN);                                                                             
                         printf("\n\t\t\t\t\t\t\t\tLogin successful! Welcome back.\n");
@@ -128,18 +129,21 @@ int main() {
 
                 //[---------------------- : Manage Orders  : ----------------------]
                 case 2:
+                    system("clear");
                     printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); printf("\t\t\t\t\t\t\tEntering Into Order Management"); Loading(); system("clear");
                     orderManagement();
                     break;
 
                 //[---------------------- : Manage Staffs  : ----------------------]
                 case 3:
+                    system("clear");
                     printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); printf("\t\t\t\t\t\t\tEntering Into Staff Management"); Loading(); system("clear");
                     staffManagement();
                     break;
 
                 //[---------------------- : Manage Customers  : ----------------------]
                 case 4:
+                    system("clear");
                     printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); printf("\t\t\t\t\t\t\tEntering Into Customer Management"); Loading(); system("clear");
                     break;
 
@@ -150,7 +154,7 @@ int main() {
                     // Logout
                     loggedIn = 0;
                     printf("\t\t\t\t\t\t\tLogged out successfully!"); Loading();
-                    sleep(2);  // Pause briefly to display the logout message
+                    sleep(2);
                     break;
                 
                 //[---------------------- : Invalid Choice  : ----------------------]
@@ -167,7 +171,6 @@ int main() {
             system("clear");
         }
     }
-
     return 0;
 }
 
