@@ -2,7 +2,15 @@
 
 A comprehensive C-based restaurant management system designed to streamline operations and enhance efficiency. This project provides robust features for managing essential aspects of a restaurant.
 
-
+~ Main Dashboard Preview:
+![Dashboard View](https://github.com/itsvijaysingh/C-Restaurant-Management-Project/blob/main/previews/Restaurent%20Management%20C%20Project.png) 
+~ Menu Managmement Preview:
+![Menu Managmement Preview](https://github.com/itsvijaysingh/C-Restaurant-Management-Project/blob/main/previews/Screenshot%202024-04-12%20at%209.00.30%20PM.png) 
+![Menu Managmement Preview](https://github.com/itsvijaysingh/C-Restaurant-Management-Project/blob/main/previews/Screenshot%202024-04-12%20at%209.00.51%20PM.png) 
+~ Order Management Preview:  
+![Order Management Preview](https://github.com/itsvijaysingh/C-Restaurant-Management-Project/blob/main/previews/Restaurent%20Order%20Management%20in%20C.png) 
+![Order Management Preview](https://github.com/itsvijaysingh/C-Restaurant-Management-Project/blob/main/previews/Restaurent%20Management%20in%20C.png) 
+![Order Management Preview](https://github.com/itsvijaysingh/C-Restaurant-Management-Project/blob/main/previews/Screenshot%202024-04-12%20at%209.01.49%20PM.png) 
 
 ## **Key Features**
 
